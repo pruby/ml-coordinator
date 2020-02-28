@@ -92,12 +92,12 @@ def get_output_url(project, machine, resource):
     
     resource_path = "projects/{}/{}/outputs/{}".format(project, machine, resource)
     try:
-        response = client.generate_presigned_post(bucket, resource_path, ExpiresIn=600)
+        url = client.generate_presigned_url('put_object', Params={'Bucket': bucket, 'Key': resource_path}, HttpMethod='PUT', ExpiresIn=600)
     except ClientError as e:
         logger.error(e)
         return make_response("Internal Error", 500)
 
-    resp = make_response(json.dumps(response), 200)
+    resp = make_response(url, 200)
     resp.headers['Content-Type'] = 'text/plain'
     return resp
 

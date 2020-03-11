@@ -1,28 +1,3 @@
-cat > /cloud.functions <<'EOF'
-function download_resource {
-	uri="`curl -s "https://vast.goddard.nz/${project}/${machine}/url/resource/${1}"`"
-	if [[ $? == 0 ]]
-		then
-		curl -s "$uri" > "$1"
-	fi
-}
-
-function upload_output {
-	url="`curl -s "https://vast.goddard.nz/${project}/${machine}/url/output/${1}"`"
-	if [[ $? == 0 ]]
-		then
-		curl -s -X PUT -T "$1" "$url"
-	fi
-}
-
-function run_script_url {
-	temp=$(mktemp)
-	curl -s "$1" > "${temp}" && source "${temp}"
-	rm -f "${temp}"
-}
-EOF
-source /cloud.functions
-
 if [[ "${project}" == "" ]]
 	then
 	echo "Error: Project name not set"
@@ -34,6 +9,33 @@ if [[ "${machine}" == "" ]]
 	echo "Error: Machine ID not set"
 	exit 1
 fi
+
+(
+echo "export project='$project'"
+echo "export machine='$machine'"
+echo
+
+cat <<'EOF'
+function download_resource {
+	fname=`basename "${1}"`
+	echo "Downloading resource ${fname}"
+	curl -L -s "https://vast.goddard.nz/${project}/${machine}/resource/${fname}" > "$1"
+}
+
+function upload_output {
+	fname=`basename "${1}"`
+	echo "Uploading output ${fname}"
+	curl -L -s -X PUT -T "$1" "https://vast.goddard.nz/${project}/${machine}/output/${fname}"
+}
+
+function run_script_url {
+	temp=$(mktemp)
+	curl -s "$1" > "${temp}" && source "${temp}"
+	rm -f "${temp}"
+}
+EOF
+) > /cloud.functions
+source /cloud.functions
 
 basedir=`pwd`
 

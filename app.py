@@ -49,9 +49,17 @@ def get_project_setup_script(project, machine):
         return page_not_found()
 
     script_path = "projects/{}/setup.sh".format(project)
-    content = get_file(script_path)
-    if content is None:
-        return page_not_found()
+    project_setup = get_file(script_path)
+    if project_setup is None:
+        project_setup = ""
+
+    script_path = "projects/{}/{}/setup.sh".format(project, machine)
+    host_setup = get_file(script_path)
+    if host_setup is None:
+        host_setup = ""
+
+    content = project_setup + b"\n" + host_setup
+
     resp = make_response(content, 200)
     resp.headers['Content-Type'] = 'text/x-shellscript'
     return resp

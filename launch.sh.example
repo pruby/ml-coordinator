@@ -24,8 +24,11 @@ function download_resource {
 
 function upload_output {
 	fname=`basename "${1}"`
-	echo "Uploading output ${fname}"
-	curl -L -s -X PUT -T "$1" "https://vast.goddard.nz/${project}/${machine}/output/${fname}"
+	url="`curl -s --insecure "https://vast.goddard.nz/${project}/${machine}/url/output/${fname}"`"
+	if [[ $? == 0 ]]
+		then
+		curl -s -X PUT -T "$1" "$url"
+	fi
 }
 
 function run_script_url {

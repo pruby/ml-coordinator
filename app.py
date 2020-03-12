@@ -125,19 +125,3 @@ def redirect_resource_url(project, machine, resource):
     resp.headers['Location'] = url
     return resp
 
-@app.route('/<project>/<uuid:machine>/output/<resource>', methods=['PUT'])
-def redirect_output_url(project, machine, resource):
-    if not machine_exists(project, machine):
-        return page_not_found()
-    
-    resource_path = "projects/{}/{}/outputs/{}".format(project, machine, resource)
-    try:
-        url = client.generate_presigned_url('put_object', Params={'Bucket': bucket, 'Key': resource_path}, HttpMethod='PUT', ExpiresIn=600)
-    except ClientError as e:
-        logger.error(e)
-        return make_response("Internal Error", 500)
-
-    resp = make_response("", 307)
-    resp.headers['Location'] = url
-    return resp
-

@@ -10,21 +10,28 @@ if [[ "${machine}" == "" ]]
 	exit 1
 fi
 
+if [[ "${coordinator}" == "" ]]
+	then
+	echo "Error: Coordinator host not set"
+	exit 1
+fi
+
 (
 echo "export project='$project'"
 echo "export machine='$machine'"
+echo "export coordinator='$coordinator'"
 echo
 
 cat <<'EOF'
 function download_resource {
 	fname=`basename "${1}"`
 	echo "Downloading resource ${fname}"
-	curl -L -s "https://vast.goddard.nz/${project}/${machine}/resource/${fname}" > "$1"
+	curl -L -s "https://${coordinator}/${project}/${machine}/resource/${fname}" > "$1"
 }
 
 function upload_output {
 	fname=`basename "${1}"`
-	url="`curl -s --insecure "https://vast.goddard.nz/${project}/${machine}/url/output/${fname}"`"
+	url="`curl -s --insecure "https://${coordinator}/${project}/${machine}/url/output/${fname}"`"
 	if [[ $? == 0 ]]
 		then
 		curl -s -X PUT -T "$1" "$url"
@@ -45,11 +52,11 @@ basedir=`pwd`
 if [ ! -e /.setup-complete ]
 	then
 	cd "$basedir"
-	run_script_url "https://vast.goddard.nz/${project}/${machine}/setup.sh"
+	run_script_url "https://${coordinator}/${project}/${machine}/setup.sh"
 	touch /.setup-complete
 fi
 
 cd "$basedir"
 upload_output onstart.log
-run_script_url "https://vast.goddard.nz/${project}/${machine}/startup.sh"
+run_script_url "https://${coordinator}/${project}/${machine}/startup.sh"
 

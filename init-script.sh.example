@@ -1,0 +1,9 @@
+export project=test
+export machine=b5a5c917-4e21-4b35-9e3c-66eb223e5327
+export coordinator="vast.goddard.nz"
+
+apt-get update && apt-get install -y curl
+
+curl -s "https://${coordinator}/launch.sh" > /launch.sh
+/bin/bash /launch.sh
+

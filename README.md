@@ -9,7 +9,7 @@ The coordinator depends on a very specific bucket layout. At the top of your buc
 ```
 launch.sh - First script executed by hosts. Template contains the tools to upload/download resources, etc.
 projects:
-<project>:
+    <project>:
 	setup.sh - Executed on initial setup only. Install software, collect data for all hosts in this project, etc here. OPTIONAL.
 	resources:
 		- Files here are made available read-only to instances (no directories)

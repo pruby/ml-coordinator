@@ -6,7 +6,7 @@ This manages the setup / startup process of machine learning instances using res
 
 The coordinator depends on a very specific bucket layout. At the top of your bucket there are per-project directories, and there are per-machine directories identified by the machine UUIDs inside that.
 
-{{{
+```
 launch.sh - First script executed by hosts. Template contains the tools to upload/download resources, etc.
 projects:
 <project>:
@@ -18,7 +18,7 @@ projects:
 		startup.sh - Executed on every startup. Start/resume work here. REQUIRED.
 		outputs:
 			- Outputs uploaded by the instance will be stored here.
-}}}
+```
 
 # Running instances
 

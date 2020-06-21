@@ -4,7 +4,7 @@ This manages the setup / startup process of machine learning instances using res
 
 ## S3 bucket layout
 
-The coordinator depends on a very specific bucket layout. At the top of your bucket there are per-project directories, and there are per-machine directories identified by the machine UUIDs inside that.
+The coordinator depends on a very specific bucket layout. There's a "projects" directory containing per-project directories, and there are per-machine directories identified by the machine UUIDs inside that.
 
 ```
 launch.sh - First script executed by hosts. Template contains the tools to upload/download resources, etc.

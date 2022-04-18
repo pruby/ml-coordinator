@@ -1,6 +1,6 @@
 export project=test
 export machine=b5a5c917-4e21-4b35-9e3c-66eb223e5327
-export coordinator="vast.goddard.nz"
+export coordinator="your-host.com"
 
 apt-get update && apt-get install -y curl
 

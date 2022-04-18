@@ -7,7 +7,8 @@ import urllib
 import json
 
 app = Flask(__name__)
-client = boto3.client('s3')
+endpoint_url = os.environ.get('S3_ENDPOINT_URL', None)
+client = boto3.client('s3', endpoint_url=endpoint_url)
 bucket = os.environ['AWS_S3_BUCKET']
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -21,6 +22,13 @@ def get_file(path):
     except ClientError as e:
         logger.error(e)
         return None
+
+def resolve_link(path):
+    link = get_file(path + '.link')
+    if link is not None:
+        path = link.decode('utf-8').strip()
+    return path
+
 
 def machine_exists(project, machine):
     setup = get_file("projects/{}/{}/startup.sh".format(project, machine))
@@ -83,6 +91,8 @@ def get_resource_url(project, machine, resource):
         return page_not_found()
     
     resource_path = "projects/{}/resources/{}".format(project, resource)
+    resource_path = resolve_link(resource_path)
+    
     try:
         url = client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': resource_path}, ExpiresIn=300)
     except ClientError as e:
@@ -99,6 +109,7 @@ def get_output_url(project, machine, resource):
         return page_not_found()
     
     resource_path = "projects/{}/{}/outputs/{}".format(project, machine, resource)
+
     try:
         url = client.generate_presigned_url('put_object', Params={'Bucket': bucket, 'Key': resource_path}, HttpMethod='PUT', ExpiresIn=600)
     except ClientError as e:
@@ -115,6 +126,8 @@ def redirect_resource_url(project, machine, resource):
         return page_not_found()
     
     resource_path = "projects/{}/resources/{}".format(project, resource)
+    resource_path = resolve_link(resource_path)
+
     try:
         url = client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': resource_path}, ExpiresIn=300)
     except ClientError as e:
